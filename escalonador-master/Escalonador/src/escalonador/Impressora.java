@@ -10,6 +10,8 @@ import java.util.ArrayList;
  */
 public class Impressora {
     private int id;
+    private Processo p;
+    private int tempo;
     private ArrayList<Processo> lista;
     
     private PrintStream erro;

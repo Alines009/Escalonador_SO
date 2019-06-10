@@ -6,6 +6,7 @@
 package escalonador;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Processo {
     private int id;
@@ -18,6 +19,8 @@ public class Processo {
     private int qtdExec;
     private ArrayList<Integer> tabelaDePaginas;
     private int qtdPaginas;
+    private int timePrinter;
+    private int timeDisc;
     
     public Processo(int id, int arrivalTime, int priority, int timeCPU, int memory, int printer, int disc){
         this.id = id;
@@ -30,6 +33,17 @@ public class Processo {
         this.tabelaDePaginas = new ArrayList<>();
         this.setQtdExec(0);
         this.qtdPaginas = (int) Math.ceil((double)memory/64);
+        Random randomico = new Random();
+        if (printer == 0) this.timePrinter = -1;
+        else {
+            float numQq = randomico.nextFloat();
+            this.timePrinter = (int) (numQq*timeCPU);
+        }
+        if (disc == 0) this.timeDisc = -1;
+        else {
+            float numQq = randomico.nextFloat();
+            this.timeDisc = (int) (numQq*timeCPU);
+        }
     }
     
     public String toString(){
