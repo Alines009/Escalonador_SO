@@ -25,17 +25,25 @@ public class Escalonador {
         try {
             Despachante d = new Despachante();
             while(executando){
-                if(contador%2==0){
-                    // Verficar atividade do cpu
-                    for(int i = 0; i < cpu.length; i++){
-                        if(cpu[i].terminouExecucao()){  // O processo que está na cpu terminou sua eecução?
-                            Processo p = (Processo) cpu[i].enviaProcesso();
+                //Imprime o tempo e o processo atualmente nas CPUs
+                System.out.println("\nTempo: "+contador);
+                for (int j = 0; j < cpu.length; j++){
+                    System.out.println("CPU " + j);
+                    if(cpu[j].p != null) System.out.println(cpu[j].p.toString());
+                }
+                
+                // Verificar atividade do cpu
+                for(int i = 0; i < cpu.length; i++){
+                    if(cpu[i].terminouExecucao()){  // O processo que está na cpu terminou sua eecução?
+                        Processo p = (Processo) cpu[i].enviaProcesso();
                             
-                            if(p.getPriority() != 0 && p.getTimeCPU() != 0){   // O processo não possui prioridade?
-                                fc.recebeProcesso(p,memoria);   // Mando de volta para o feedback
-                            }
+                        if(p.getPriority() != 0 && p.getTimeCPU() != 0){   // O processo não possui prioridade?
+                            fc.recebeProcesso(p,memoria);   // Mando de volta para o feedback
                         }
                     }
+                }
+                
+                if(contador%2==0){
                     int i = 0;
                     while(i < novos.size()){
                         flag = d.Despachar(novos.get(i), contador, fp, fc,memoria);
@@ -108,7 +116,7 @@ public class Escalonador {
                 Thread.sleep (1000); 
             
         
-                System.out.print("\nTempo: "+contador);
+                //System.out.print("\nTempo: "+contador);
                 contador +=1;
                 for(int i = 0; i < cpu.length; i++){
                     if(!cpu[i].isOcioso()){

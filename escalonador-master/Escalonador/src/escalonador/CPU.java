@@ -6,7 +6,7 @@ import java.io.UnsupportedEncodingException;
 
 public class CPU {
     private int id;
-    private Processo p;
+    public Processo p;
     private int tempoUtilizacao;
     private int tempoTotal;         // Variavel que verifica o tempo total em que o processo atual está na cpu
     private PrintStream erro;
