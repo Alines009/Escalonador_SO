@@ -11,6 +11,7 @@ import java.util.Random;
 public class Processo {
     private int id;
     private int arrivalTime;
+    private int originalArrivalTime;
     private int priority;
     private int timeCPU;
     private int memory;
@@ -25,6 +26,7 @@ public class Processo {
     public Processo(int id, int arrivalTime, int priority, int timeCPU, int memory, int printer, int disc){
         this.id = id;
         this.arrivalTime = arrivalTime;
+        this.originalArrivalTime = arrivalTime;
         this.priority = priority;
         this.timeCPU = timeCPU;
         this.memory = memory;
@@ -37,17 +39,19 @@ public class Processo {
         if (printer == 0) this.timePrinter = -1;
         else {
             float numQq = randomico.nextFloat();
-            this.timePrinter = (int) (numQq*timeCPU);
+            numQq = numQq*timeCPU;
+            this.timePrinter = (int) numQq;
         }
         if (disc == 0) this.timeDisc = -1;
         else {
             float numQq = randomico.nextFloat();
-            this.timeDisc = (int) (numQq*timeCPU);
+            numQq = numQq*timeCPU;
+            this.timeDisc = (int) numQq;
         }
     }
     
     public String toString(){
-        return this.getId()+" "+this.arrivalTime+" "+this.priority+" "+this.timeCPU+" "+this.memory+" "+this.printer+" "+this.disc+"\n";  
+        return "ID: " + this.getId()+"; CHEGADA: "+this.arrivalTime+"; PRIORIDADE: "+this.priority+"; TEMPO CPU: "+this.timeCPU+"; MEMÓRIA: "+this.memory+"; IMPRESSORA: "+this.printer+"; QUANDO: "+this.timePrinter+"; DISCO: "+this.disc+"; QUANDO: "+this.timeDisc+"\n";  
     }
 
     public int getId() {
@@ -121,14 +125,42 @@ public class Processo {
     public int getTimeCPU() {
         return timeCPU;
     }
-
+    
     /**
      * @param timeCPU the timeCPU to set
      */
     public void setTimeCPU(int timeCPU) {
         this.timeCPU = timeCPU;
     }
-
+    
+    /**
+     * @return the timePrinter
+     */
+    public int getTimePrinter(){
+        return timePrinter;
+    }
+    
+    /**
+     * @param timePrinter the timePrinter to set
+     */
+    public void setTimePrinter(int timePrinter) {
+        this.timePrinter = timePrinter;
+    }
+    
+    /**
+     * @return the timeDisc
+     */
+    public int getTimeDisc(){
+        return timeDisc;
+    }
+    
+    /**
+     * @param timeDisc the timeDisc to set
+     */
+    public void setTimeDisc(int timeDisc) {
+        this.timeDisc = timeDisc;
+    }
+    
     /**
      * @return the qtdPaginas
      */
@@ -158,10 +190,5 @@ public class Processo {
         for(int i = 0; i< this.tabelaDePaginas.size(); i++){
             System.out.println("\n"+i+" : "+this.tabelaDePaginas.get(i).toString());
         }
-    }
-
-
-
-    
-    
+    } 
 }

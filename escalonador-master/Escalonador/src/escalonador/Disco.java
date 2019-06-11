@@ -10,33 +10,60 @@ import java.util.ArrayList;
  */
 public class Disco {
     private int id;
-    private Processo p;
+    public Processo p;
     private int tempo;
-    private ArrayList<Processo> lista;
+    private int tempoUtilizado;
     
     private PrintStream erro;
     
     public Disco(int id) throws UnsupportedEncodingException{
         this.erro = new PrintStream(System.err, true, "UTF-8");
         this.id = id;
-        this.lista = new ArrayList<Processo>();
+        this.tempo = 2;
     }
     
     public int recebeProcesso(Processo p){
         if(p != null){
-            this.lista.add(p);
+            this.p = p;
             return 0;
         }
         this.erro.println("Erro 1 (Disco.recebeProcesso): Não existe processo para ser adicionado.");
         return 1;
-    };
+    }
     
+    public boolean terminouExecucao(){
+        if(!this.isOcioso()){
+            if (this.tempoUtilizado == this.tempo){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public void incrementaTempo(){
+        if(!this.isOcioso()){
+            this.tempoUtilizado++;
+        }
+    }
+    
+    public boolean isOcioso(){
+        if (this.p == null){
+            return true;
+        }
+        return false;
+    }
     
     public Object enviaProcesso(){
-        if(!this.lista.isEmpty()){
-            return this.lista.remove(0);
+        if(!this.isOcioso()){   // O processo está na impressora
+            Processo p = this.p;
+            // "Reseto" a impressora
+            this.p = null;
+            this.tempoUtilizado = 0;
+            
+            // envio p
+            return p;
         }
-        this.erro.println("Erro 2 (Disco.enviaProcesso): Fila Vazia.");
+        this.erro.println("Erro 2 (Impressora.enviaProcesso): Não existe processo para ser enviado.");
         return 2;
     }
 }
