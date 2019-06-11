@@ -44,10 +44,10 @@ public class FilaPrioridade {
     }
     
     public void ImprimePrioridade(){
+        System.out.println(Cores.ANSI_RED + "FILA DE PRIORIDADE" + Cores.ANSI_RESET);
         if(this.filaPrioridade== null){
-            System.out.println("Não há processos nesta fila");
+            System.out.println("    Não há processos nesta fila");
         } else {
-        System.out.println("PROCESSOS EM FILA DE PRIORIDADE");
         for(int i = 0; i< this.filaPrioridade.size(); i++){
             System.out.println(this.filaPrioridade.get(i).toString());
         }

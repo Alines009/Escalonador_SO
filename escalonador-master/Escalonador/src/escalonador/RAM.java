@@ -42,7 +42,7 @@ public class RAM {
                     i++;
                 }
                 this.setQuadrosAlocados(this.getQuadrosAlocados() + p.getQtdPaginas());
-                System.out.println("Página do Proc | Quadro da MP");
+                //System.out.println("Página do Proc | Quadro da MP");
                 p.setTabelaDePaginas(quadrosUsados);
                 this.setEspacoAlocado(this.getEspacoAlocado() + p.getMemory());
                 this.getFila().add(p.getId());
@@ -145,5 +145,16 @@ public class RAM {
      */
     public void setQuadrosAlocados(int quadrosAlocados) {
         this.quadrosAlocados = quadrosAlocados;
+    }
+    
+    public void imprimeRAM(){
+        System.out.println(Cores.ANSI_RED + "MEMORIA RAM" + Cores.ANSI_RESET);
+        System.out.println();
+        System.out.println("Paginacao - ID Processo");
+        for(int i = 0; i < (this.quadroDaMP.length/4); i++){
+            System.out.println("Pagina: "+i+" - "+"ID Processo: "+this.quadroDaMP[i]+"       "+"Pagina: "+(64+i)+" - "+"ID Processo: "+this.quadroDaMP[64+i]+"       "+"Pagina: "+(128+i)+" - "+"ID Processo: "+this.quadroDaMP[128+i]
+            +"       "+"Pagina:"+(192+i)+" - "+"ID Processo: "+this.quadroDaMP[192+i]);
+        }
+        System.out.println(Cores.ANSI_RED +"****************" + Cores.ANSI_RESET);
     }
 }

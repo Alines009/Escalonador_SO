@@ -20,7 +20,9 @@ public class Leitura {
         String linha = lerArq.readLine();
         while (linha != null){
             Processo p = CriarProcessos(linha);
-            novos.add(p);            
+            if(p != null){
+                novos.add(p);   
+            }  
             linha = lerArq.readLine();
         }
         return novos;
@@ -30,6 +32,9 @@ public class Leitura {
         String array[] = new String [6];
         array = linha.split(", ");
         Processo p = new Processo(id,Integer.parseInt(array[0]),Integer.parseInt(array[1]),Integer.parseInt(array[2]),Integer.parseInt(array[3]),Integer.parseInt(array[4]),Integer.parseInt(array[5]));
+        if(p.getPriority() == 0 && (p.getPrinter() != 0 || p.getDisc() != 0)){
+            return null;
+        }
         id += 1;
         return p;
     }

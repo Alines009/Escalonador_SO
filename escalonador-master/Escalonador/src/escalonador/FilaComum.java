@@ -70,11 +70,15 @@ public class FilaComum {
     }
     
     public void ImprimeComum(){
-        System.out.println("PROCESSOS EM FILA COMUM");
+        System.out.println(Cores.ANSI_RED + "FILA COMUM" + Cores.ANSI_RESET);
         for(int i = 0; i< this.filaComum.size(); i++){
-            System.out.println("FILA "+i);
-            for(int j = 0; j < this.filaComum.get(i).size(); j++){
-                System.out.println(this.filaComum.get(i).get(j).toString());
+            System.out.println(Cores.ANSI_GREEN + "    FILA "+i+":"+ Cores.ANSI_RESET);
+            if(this.filaComum.get(i).size() == 0){
+                System.out.println("        Fila Vazia");
+            }else{
+                for(int j = 0; j < this.filaComum.get(i).size(); j++){
+                    System.out.println("        "+this.filaComum.get(i).get(j).toString());
+                }
             }
         }
     }

@@ -3,10 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Ricardo%20Monteiro/Documents/escalonador/Escalonador/src/escalonador/FilaComum.java</file>
-            <file>file:/C:/Users/Ricardo%20Monteiro/Documents/escalonador/Escalonador/src/escalonador/FilaPrioridade.java</file>
-            <file>file:/C:/Users/Ricardo%20Monteiro/Documents/escalonador/Escalonador/src/escalonador/Escalonador.java</file>
-            <file>file:/C:/Users/Ricardo%20Monteiro/Documents/escalonador/Escalonador/src/escalonador/CPU.java</file>
+            <file>file:/C:/Users/Ricardo%20Monteiro/Desktop/Escalonador_SO-master/escalonador-master/Escalonador/src/escalonador/RAM.java</file>
+            <file>file:/C:/Users/Ricardo%20Monteiro/Desktop/Escalonador_SO-master/escalonador-master/Escalonador/src/escalonador/FilaComum.java</file>
+            <file>file:/C:/Users/Ricardo%20Monteiro/Desktop/Escalonador_SO-master/escalonador-master/Escalonador/src/escalonador/Processo.java</file>
+            <file>file:/C:/Users/Ricardo%20Monteiro/Desktop/Escalonador_SO-master/escalonador-master/Escalonador/src/escalonador/Escalonador.java</file>
+            <file>file:/C:/Users/Ricardo%20Monteiro/Desktop/Escalonador_SO-master/escalonador-master/Escalonador/src/escalonador/Leitura.java</file>
         </group>
     </open-files>
 </project-private>
