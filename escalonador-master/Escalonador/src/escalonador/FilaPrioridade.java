@@ -6,9 +6,10 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 
 public class FilaPrioridade {
-    private ArrayList<Processo> filaPrioridade;
+    private ArrayList<Processo> filaPrioridade; // lista de processos com prioridade
     private PrintStream erro;
     
+    //inicia fila de prioridade
     public FilaPrioridade() throws UnsupportedEncodingException{
         this.erro = new PrintStream(System.err, true, "UTF-8");
         this.filaPrioridade = new ArrayList<Processo>();
@@ -24,6 +25,7 @@ public class FilaPrioridade {
         return 1;     
     }
     
+    //recebe o processo na fila
     public int recebeProcesso(Processo p, RAM memoria){
         try{
             memoria.alocaProcesso(p);
@@ -34,6 +36,7 @@ public class FilaPrioridade {
         }
     }
     
+    // retorna o primeiro processo na fila e o remove da fila
     public Object enviaProcesso(){
         try{
             return this.filaPrioridade.remove(0);
@@ -43,6 +46,7 @@ public class FilaPrioridade {
         }
     }
     
+    //Imprime processos na fila
     public void ImprimePrioridade(){
         System.out.println(Cores.ANSI_RED + "FILA DE PRIORIDADE" + Cores.ANSI_RESET);
         if(this.filaPrioridade== null){
@@ -54,6 +58,7 @@ public class FilaPrioridade {
         }
     }
     
+    //retorna se fila está vazia
     public boolean isVazia(){
         return (this.filaPrioridade.size() == 0)? true: false;
     }

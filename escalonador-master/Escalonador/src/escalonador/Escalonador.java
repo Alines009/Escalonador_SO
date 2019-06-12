@@ -8,7 +8,7 @@ public class Escalonador {
     public static void main(String[] args) throws Exception{
         int contador = 0;
         ArrayList<Processo> novos = new ArrayList();    //Cria lista de processos novos
-        Leitura leitura = new Leitura();
+        Leitura leitura = new Leitura();                //Inicia o leitor do arquivo txt
         novos = leitura.lerArquivos();                  //Lendo o arquivo processos.txt
         
         // Cria Fila de Prontos
@@ -17,6 +17,7 @@ public class Escalonador {
         
         // Cria as CPUs
         CPU cpu[] = {new CPU(0), new CPU(1), new CPU(2), new CPU(3)};
+        
         // Cria a memória RAM
         RAM memoria = new RAM();
         
@@ -26,20 +27,19 @@ public class Escalonador {
         ArrayList<Processo> filaImpressora = new ArrayList();
         ArrayList<Processo> filaDisco = new ArrayList();
         
-        boolean executando = true;
+        boolean executando = true;  //Cria a variável que irá verificar se a execução findou ou não
          
         System.out.println(Cores.ANSI_RED + "INICIANDO ESCALONADOR" + Cores.ANSI_RESET);
         System.out.println(Cores.ANSI_RED + "*********************" + Cores.ANSI_RESET);
         Thread.sleep (2000); 
         
-        int flag;
         try {
-            // Crio o desachante
+            // Crio o despachante
             Despachante d = new Despachante();
             while(executando){
                 
                 status(contador, novos, cpu, impressora, disco, filaImpressora, 
-                        filaDisco, memoria, fp, fc);
+                        filaDisco, memoria, fp, fc); //Imprime o status do escalonador no tempo atual
                 // Verificar atividade do cpu
                 for(int i = 0; i < cpu.length; i++){
                     if(cpu[i].terminouExecucao()){                              // O processo que está na cpu terminou sua eecução?
@@ -53,8 +53,9 @@ public class Escalonador {
                         }
                         else if(p.getPriority() != 0 && p.getTimeCPU() != 0){   // O processo não possui prioridade?
                             fc.recebeProcesso(p,memoria);                       // Mando de volta para o feedback
-                        }else if(p.getTimeCPU() == 0){
-                            memoria.desalocaProcesso(p);
+                        }
+                        else if(p.getTimeCPU() == 0){                          // O processo chegou ao fim?
+                            memoria.desalocaProcesso(p);                       // Desaloco o processo da MP
                         }
                     }
                     
@@ -64,20 +65,20 @@ public class Escalonador {
                 for(int i = 0; i < impressora.length; i++){
                     if(impressora[i].terminouExecucao()){                       // O processo que está na impressora terminou sua execução?
                         Processo p = (Processo) impressora[i].enviaProcesso();
-                        p.setTimePrinter(-1);
-                        p.setPrinter(0);
+                        p.setTimePrinter(-1);                                   //Afirmo que não existe mais um tempo para p usar a impressora
+                        p.setPrinter(0);                                        //Afirmo que p não precisa mais usar a impressora
                         
                         if((p.getDisc() == 1) && (p.getTimeDisc() == 0)){       //O processo precisa usar o disco?
                             filaDisco.add(p);                                   // Mando para a fila de espera de discos
                         }
-                        else if(p.getTimeCPU() != 0){   // O processo não terminou execução?
-                            p.setPriority(1);           // Seto a prioridade para 1
-                            p.setQtdExec(0);            // Seto a quantidade de execuções para 0
-                            p.setArrivalTime(contador); //Seto o momento de chegada para o momento atual
-                            novos.add(p);               // Mando de volta para a lista de novos
+                        else if(p.getTimeCPU() != 0){       // O processo não terminou execução?
+                            p.setPriority(1);               // Seto a prioridade para 1
+                            p.setQtdExec(0);                // Seto a quantidade de execuções para 0
+                            p.setArrivalTime(contador);     //Seto o momento de chegada para o momento atual
+                            novos.add(p);                   // Mando de volta para a lista de novos
                         }
-                    } else {
-                        impressora[i].incrementaTempo();
+                    } else {                                //Caso o processo na impressora não tenha terminado a execução
+                        impressora[i].incrementaTempo();    //Incremento o tempo de uso do processo atual na impressora
                     }
                 }
                 
@@ -85,8 +86,8 @@ public class Escalonador {
                 for(int i = 0; i < disco.length; i++){
                     if(disco[i].terminouExecucao()){                            // O processo que está no disco terminou sua execução?
                         Processo p = (Processo) disco[i].enviaProcesso();
-                        p.setTimeDisc(-1);
-                        p.setDisc(0);
+                        p.setTimeDisc(-1);                                      //Afirmo que não existe mais um tempo para p usar o disco
+                        p.setDisc(0);                                           //Afirmo que p não precisa mais usar o disco
                         
                         if((p.getPrinter() == 1) && (p.getTimePrinter() == 0)){ //O processo precisa usar a impressora?
                             filaImpressora.add(p);                              // Mando para a fila de espera de impressoras
@@ -97,37 +98,38 @@ public class Escalonador {
                             p.setArrivalTime(contador);                         //Seto o momento de chegada para o momento atual
                             novos.add(p);                                       // Mando de volta para a lista de novos
                         }
-                    } else {
-                        disco[i].incrementaTempo();
+                    } else {                                                    //Caso o processo no disco não tenha terminado a execução
+                        disco[i].incrementaTempo();                             //Incremento o tempo de uso do processo atual no disco
                     }
                 }
                 
-                if(contador%2==0){
+                if(contador%2==0){  // A cada 2 segundos verifico a fila de novos
                     int i = 0;
-                    while(i < novos.size()){
-                        flag = d.Despachar(novos.get(i), contador, fp, fc,memoria);
-                        if(flag == 0){
+                    int flag;
+                    while(i < novos.size()){                                        //Enquanto houver processos na fila de novos não verificados
+                        flag = d.Despachar(novos.get(i), contador, fp, fc,memoria); //flag recebe o valor de verificação se o processo foi bem sucedido em ser despachado
+                        if(flag == 0){          //Se o processo foi despachado, ele é removido da fila de novos
                             novos.remove(i);
-                        }else{
+                        }else{                  //Caso ele não tenha sido despachado, incremento i e passo para o próximo da lista de novos
                             i += 1;
                         }
                     }
-                    executando = terminou(fp,fc,novos,cpu,impressora,disco,filaImpressora,filaDisco);
+                    executando = terminou(fp,fc,novos,cpu,impressora,disco,filaImpressora,filaDisco);   //Verifica se ainda existem processos a serem processados
                 }
                 
                 //Existe algum processo para executar nas impressoras?
                 if(!filaImpressora.isEmpty()){
                     // Faço uma verificação se todas estão ocupadas
                     ArrayList<Boolean> ocupacoes = new ArrayList<Boolean>();
-                    for(int j = 0; j < impressora.length; j++){
+                    for(int j = 0; j < impressora.length; j++){ //Para cada impressora, adiciono se está ocupada ou não na lista
                         ocupacoes.add(impressora[j].isOciosa());
                     }
                     // Enquanto existir impressora livre e a fila de impressão está com processos? Se sim, envia processo para a impressora
                     while(ocupacoes.contains(true) && (!filaImpressora.isEmpty())){
                         Processo p = filaImpressora.remove(0);
-                        int impressoraDisponivel = ocupacoes.indexOf(true);
-                        impressora[impressoraDisponivel].recebeProcesso(p);
-                        ocupacoes.set(impressoraDisponivel, false);
+                        int impressoraDisponivel = ocupacoes.indexOf(true); //Pego o índice da primeira impressora disponível
+                        impressora[impressoraDisponivel].recebeProcesso(p); //Envio p para a impressora disponível
+                        ocupacoes.set(impressoraDisponivel, false);         //Indico que impressora que estava disponível, não está mais
                     }
                 }
                 
@@ -135,15 +137,15 @@ public class Escalonador {
                 if(!filaDisco.isEmpty()){
                     // Faço uma verificação se todos estão ocupados
                     ArrayList<Boolean> ocupacoes = new ArrayList<Boolean>();
-                    for(int j = 0; j < disco.length; j++){
+                    for(int j = 0; j < disco.length; j++){  //Para cada disco, adiciono se está ocupado ou não na lista
                         ocupacoes.add(disco[j].isOcioso());
                     }
                     // Enquanto existir disco livre e a fila de discos está com processos? Se sim, envia processo para o disco
                     while(ocupacoes.contains(true) && (!filaDisco.isEmpty())){
                         Processo p = filaDisco.remove(0);
-                        int discoDisponivel = ocupacoes.indexOf(true);
-                        disco[discoDisponivel].recebeProcesso(p);
-                        ocupacoes.set(discoDisponivel, false);
+                        int discoDisponivel = ocupacoes.indexOf(true);  //Pego o índice do primeiro disco disponível
+                        disco[discoDisponivel].recebeProcesso(p);       //Envio p para o disco disponível
+                        ocupacoes.set(discoDisponivel, false);          //Indico que disco que estava disponível, não está mais
                     }
                 }
                 
@@ -165,30 +167,30 @@ public class Escalonador {
                         }else{
                             p = (Processo) fc.enviaProcesso();
                         }
-                        int cpuDisponivel = prioridades.indexOf(-1);
-                        if(p.getPriority() == 0){
+                        int cpuDisponivel = prioridades.indexOf(-1);    //Pego o índice da primeira cpu disponível
+                        if(p.getPriority() == 0){                       //Se p veio da fila de prioridade, envio para cpu disponível e indico que ele será executado até o fim
                             cpu[cpuDisponivel].recebeProcesso(p);
-                            prioridades.set(cpuDisponivel, p.getPriority());
+                            prioridades.set(cpuDisponivel, p.getPriority());    //Indico que cpu que estava disponível, não está mais
                         }else{
-                            if ((p.getPrinter() == 1) && (p.getTimePrinter() == 0)){
-                                filaImpressora.add(p);
+                            if ((p.getPrinter() == 1) && (p.getTimePrinter() == 0)){    //Se p veio da fila comum, e precisa usar a impressora agora
+                                filaImpressora.add(p);                                  //Envio para fila de espera da impressora
                             }
-                            else if ((p.getDisc() == 1) && (p.getTimeDisc() == 0)){
-                                filaDisco.add(p);
+                            else if ((p.getDisc() == 1) && (p.getTimeDisc() == 0)){     //Se p veio da fila comum, e precisa usar o disco agora
+                                filaDisco.add(p);                                       //Envio para fila de espera do disco
                             }
-                            else {
-                                cpu[cpuDisponivel].recebeProcesso(p, 2);
-                                prioridades.set(cpuDisponivel, p.getPriority());
+                            else {                                                  //Caso não precise usar nem a impressora, nem o disco agora
+                                cpu[cpuDisponivel].recebeProcesso(p, 2);            //Envio p para a cpu disponível, para ser usado por no máximo 2 segundos(quantum)
+                                prioridades.set(cpuDisponivel, p.getPriority());    //Indico que cpu que estava disponível, não está mais
                             }
                         }
                     }
                 }
                
-                Thread.sleep (1000); 
+                Thread.sleep (1000);    //Aguardo 1 segundo antes de incrementar o contador
 
-                contador +=1;
+                contador +=1;   //Incremento contador
                 // Verifica quais CPUs estão com processos. Caso verdadeiro, incrementa o contador de tempo da CPU
-                for(int i = 0; i < cpu.length; i++){
+                for(int i = 0; i < cpu.length; i++){    //Para cada cpu que está em uso, incremento 1 no tempo de uso do processo
                     if(!cpu[i].isOcioso()){
                         cpu[i].incrementaTempo();
                     }
@@ -196,7 +198,7 @@ public class Escalonador {
                     
             }
             status(contador, novos, cpu, impressora, disco, filaImpressora, 
-                        filaDisco, memoria, fp, fc);
+                        filaDisco, memoria, fp, fc);                        //Imprime o status do escalonador no final da execução
  
             System.out.println(Cores.ANSI_GREEN + "*********************" + Cores.ANSI_RESET);
             System.out.println(Cores.ANSI_GREEN + "ESCALONADOR TERMINADO" + Cores.ANSI_RESET);
@@ -209,17 +211,19 @@ public class Escalonador {
         // Se a fila de prioridades, a fila comum, a fila de novos, a fila da impressora e a fila de disco estão vazias
         if(fp.isVazia() && fc.isVazia() && novos.isEmpty() && filaImpressora.isEmpty() && filaDisco.isEmpty()){
             
-            // Se alguma impressora não estiver ociosa, flag virará falso
+            // Se alguma cpu não estiver ociosa, flag virará falso
             for(int j = 0; (j < cpu.length); j++){
                 if(!cpu[j].isOcioso()){
                     return true;
                 }
             }
+            // Se alguma impressora não estiver ociosa, flag virará falso
             for(int j = 0; (j < impressora.length); j++){
                 if(!impressora[j].isOciosa()){
                     return true;
                 }
             }
+            // Se algum disco não estiver ocioso, flag virará falso
             for(int j = 0; (j < disco.length); j++){
                 if(!disco[j].isOcioso()){
                     return true;
