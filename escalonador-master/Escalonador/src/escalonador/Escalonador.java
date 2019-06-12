@@ -37,78 +37,9 @@ public class Escalonador {
             // Crio o desachante
             Despachante d = new Despachante();
             while(executando){
-                //Imprime o tempo
-                System.out.println(Cores.ANSI_BLUE + "Tempo: " + contador + Cores.ANSI_RESET);
                 
-                // Imprime a fila de novos
-                System.out.println(Cores.ANSI_RED + "FILA DE NOVOS" + Cores.ANSI_RESET);
-                for (int j = 0; j < novos.size(); j++){
-                    System.out.println("    "+novos.get(j).toString());
-                }
-                System.out.println();
-                
-                 // Imprime os processos atualmente nas CPUs
-                for (int j = 0; j < cpu.length; j++){
-                    //System.out.println("CPU " + j);
-                    if(cpu[j].getProcesso() != null){ 
-                        System.out.println("CPU " + j + ": " + cpu[j].getProcesso().toString());
-                    }else{
-                        System.out.println(Cores.ANSI_PURPLE + "CPU " + j + ": CPU Ociosa" + Cores.ANSI_RESET);
-                    }
-                }
-                System.out.println();
-                
-                // Imprime os processos na impressora
-                for (int j = 0; j < impressora.length; j++){
-                    
-                    if(impressora[j].getProcesso() != null) {
-                        System.out.println("IMPRESSORA " + j + ": " + impressora[j].getProcesso().toString());
-                    }
-                    else{
-                        System.out.println(Cores.ANSI_PURPLE + "IMPRESSORA " + j + ": IMPRESSORA Ociosa" + Cores.ANSI_RESET);
-                    }
-                }
-                System.out.println();
-                
-                // Imprime os processos que estão o disco
-                for (int j = 0; j < disco.length; j++){
-                    System.out.println("DISCO " + j);
-                    if(disco[j].getProcesso() != null){
-                        System.out.println("DISCO " + j + ": " + disco[j].getProcesso().toString());
-                    }else{
-                        System.out.println(Cores.ANSI_PURPLE + "DISCO " + j + ": DISCO Ocioso" + Cores.ANSI_RESET);
-                    }
-                }
-                System.out.println();
-                
-                // Imprime a fila de impressora
-                System.out.println(Cores.ANSI_RED + "FILA DE IMPRESSORA" + Cores.ANSI_RESET);
-                if(filaImpressora.size() == 0){
-                    System.out.println("    Fila Vazia");
-                }else{
-                    for (int j = 0; j < filaImpressora.size(); j++){
-                        System.out.println("    " + filaImpressora.get(j).toString());
-                    }
-                }
-                System.out.println();
-                
-                // Imprime a fila de disco
-                System.out.println(Cores.ANSI_RED + "FILA DE DISCO" + Cores.ANSI_RESET);
-                if(filaDisco.size() == 0){
-                    System.out.println("    Fila Vazia");
-                }else{
-                    for (int j = 0; j < filaDisco.size(); j++){
-                        System.out.println("    " + filaDisco.get(j).toString());
-                    }
-                }
-                // Imprime as filas de Prioridade e Comum
-                fp.ImprimePrioridade();
-                fc.ImprimeComum();
-                
-                // Imprime os Processos alocados na RAM
-                memoria.imprimeRAM();
-                System.out.println("------------------------------------");
-                
+                status(contador, novos, cpu, impressora, disco, filaImpressora, 
+                        filaDisco, memoria, fp, fc);
                 // Verificar atividade do cpu
                 for(int i = 0; i < cpu.length; i++){
                     if(cpu[i].terminouExecucao()){                              // O processo que está na cpu terminou sua eecução?
@@ -122,6 +53,8 @@ public class Escalonador {
                         }
                         else if(p.getPriority() != 0 && p.getTimeCPU() != 0){   // O processo não possui prioridade?
                             fc.recebeProcesso(p,memoria);                       // Mando de volta para o feedback
+                        }else if(p.getTimeCPU() == 0){
+                            memoria.desalocaProcesso(p);
                         }
                     }
                     
@@ -262,6 +195,8 @@ public class Escalonador {
                 }
                     
             }
+            status(contador, novos, cpu, impressora, disco, filaImpressora, 
+                        filaDisco, memoria, fp, fc);
  
             System.out.println(Cores.ANSI_GREEN + "*********************" + Cores.ANSI_RESET);
             System.out.println(Cores.ANSI_GREEN + "ESCALONADOR TERMINADO" + Cores.ANSI_RESET);
@@ -273,26 +208,103 @@ public class Escalonador {
     public static boolean terminou(FilaPrioridade fp, FilaComum fc, ArrayList<Processo> novos, CPU cpu[], Impressora impressora[], Disco disco[], ArrayList<Processo> filaImpressora, ArrayList<Processo> filaDisco){
         // Se a fila de prioridades, a fila comum, a fila de novos, a fila da impressora e a fila de disco estão vazias
         if(fp.isVazia() && fc.isVazia() && novos.isEmpty() && filaImpressora.isEmpty() && filaDisco.isEmpty()){
-            boolean flag = true;
+            
             // Se alguma impressora não estiver ociosa, flag virará falso
-            for(int j = 0; (j < cpu.length) && flag ; j++){
+            for(int j = 0; (j < cpu.length); j++){
                 if(!cpu[j].isOcioso()){
-                    flag = false;
+                    return true;
                 }
             }
-            for(int j = 0; (j < impressora.length) && flag ; j++){
+            for(int j = 0; (j < impressora.length); j++){
                 if(!impressora[j].isOciosa()){
-                    flag = false;
+                    return true;
                 }
             }
-            for(int j = 0; (j < disco.length) && flag ; j++){
+            for(int j = 0; (j < disco.length); j++){
                 if(!disco[j].isOcioso()){
-                    flag = false;
+                    return true;
                 }
             }
-            return !flag;
+            return false;
         }
         return true;
+    }
+    
+    public static void status(int contador, ArrayList<Processo> novos, CPU cpu[],
+            Impressora impressora[], Disco disco[], ArrayList<Processo> filaImpressora, ArrayList<Processo> filaDisco,
+            RAM memoria, FilaPrioridade fp, FilaComum fc){
+            //Imprime o tempo
+                System.out.println(Cores.ANSI_BLUE + "Tempo: " + contador + Cores.ANSI_RESET);
+                
+                // Imprime a fila de novos
+                System.out.println(Cores.ANSI_RED + "FILA DE NOVOS" + Cores.ANSI_RESET);
+                for (int j = 0; j < novos.size(); j++){
+                    System.out.println("    "+novos.get(j).toString());
+                }
+                System.out.println();
+                
+                 // Imprime os processos atualmente nas CPUs
+                for (int j = 0; j < cpu.length; j++){
+                    //System.out.println("CPU " + j);
+                    if(cpu[j].getProcesso() != null){ 
+                        System.out.println("CPU " + j + ": " + cpu[j].getProcesso().toString());
+                    }else{
+                        System.out.println(Cores.ANSI_PURPLE + "CPU " + j + ": CPU Ociosa" + Cores.ANSI_RESET);
+                    }
+                }
+                System.out.println();
+                
+                // Imprime os processos na impressora
+                for (int j = 0; j < impressora.length; j++){
+                    
+                    if(impressora[j].getProcesso() != null) {
+                        System.out.println("IMPRESSORA " + j + ": " + impressora[j].getProcesso().toString());
+                    }
+                    else{
+                        System.out.println(Cores.ANSI_PURPLE + "IMPRESSORA " + j + ": IMPRESSORA Ociosa" + Cores.ANSI_RESET);
+                    }
+                }
+                System.out.println();
+                
+                // Imprime os processos que estão o disco
+                for (int j = 0; j < disco.length; j++){
+                    
+                    if(disco[j].getProcesso() != null){
+                        System.out.println("DISCO " + j + ": " + disco[j].getProcesso().toString());
+                    }else{
+                        System.out.println(Cores.ANSI_PURPLE + "DISCO " + j + ": DISCO Ocioso" + Cores.ANSI_RESET);
+                    }
+                }
+                System.out.println();
+                
+                // Imprime a fila de impressora
+                System.out.println(Cores.ANSI_RED + "FILA DE IMPRESSORA" + Cores.ANSI_RESET);
+                if(filaImpressora.size() == 0){
+                    System.out.println("    Fila Vazia");
+                }else{
+                    for (int j = 0; j < filaImpressora.size(); j++){
+                        System.out.println("    " + filaImpressora.get(j).toString());
+                    }
+                }
+                System.out.println();
+                
+                // Imprime a fila de disco
+                System.out.println(Cores.ANSI_RED + "FILA DE DISCO" + Cores.ANSI_RESET);
+                if(filaDisco.size() == 0){
+                    System.out.println("    Fila Vazia");
+                }else{
+                    for (int j = 0; j < filaDisco.size(); j++){
+                        System.out.println("    " + filaDisco.get(j).toString());
+                    }
+                }
+                // Imprime as filas de Prioridade e Comum
+                fp.ImprimePrioridade();
+                fc.ImprimeComum();
+                
+                // Imprime os Processos alocados na RAM
+                memoria.imprimeRAM();
+                System.out.println("------------------------------------");
+            
     }
         
 }

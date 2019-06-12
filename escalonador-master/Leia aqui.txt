@@ -1,0 +1,9 @@
+Manual de Instruções
+
+O Trabalho foi realizado em Java usando a IDE Netbeans. Não garantiremos
+se irá funcionar da mesma forma no eclipse.
+
+Para colocar processos, deve-se entrar na pasta Escalonador e abrir o arquivo
+processos.txt e colocar novos processos como especificado no trabalho.
+
+Boa Tarde.

@@ -28,44 +28,57 @@ public class RAM {
     
     int alocaProcesso(Processo p){
         try{
-            if( (this.getQuadrosAlocados() + p.getQtdPaginas()) <= this.getQuadroDaMP().length){
-                int n = p.getQtdPaginas();
-                System.out.println("\n Qtd de páginas para o processo "+p.getId()+": "+p.getQtdPaginas());
-                int i = 0; //contador
-                ArrayList<Integer> quadrosUsados = new ArrayList();
-                while(n!=0){
-                    if(this.getQuadroDaMP()[i] == 0){
-                        this.getQuadroDaMP()[i] = p.getId();
-                        quadrosUsados.add(i);
-                        n--;
+            if(!this.fila.contains(p.getId())){
+                if( (this.getQuadrosAlocados() + p.getQtdPaginas()) <= this.getQuadroDaMP().length){
+                    int n = p.getQtdPaginas();
+                    System.out.println("\n Qtd de páginas para o processo "+p.getId()+": "+p.getQtdPaginas());
+                    int i = 0; //contador
+                    ArrayList<Integer> quadrosUsados = new ArrayList();
+                    while(n!=0){
+                        if(this.getQuadroDaMP()[i] == 0){
+                            this.getQuadroDaMP()[i] = p.getId();
+                            quadrosUsados.add(i);
+                            n--;
+                        }
+                        i++;
                     }
-                    i++;
+                    this.setQuadrosAlocados(this.getQuadrosAlocados() + p.getQtdPaginas());
+                    //System.out.println("Página do Proc | Quadro da MP");
+                    p.setTabelaDePaginas(quadrosUsados);
+                    this.setEspacoAlocado(this.getEspacoAlocado() + p.getMemory());
+                    this.getFila().add(p.getId());
+                    return 0;
                 }
-                this.setQuadrosAlocados(this.getQuadrosAlocados() + p.getQtdPaginas());
-                //System.out.println("Página do Proc | Quadro da MP");
-                p.setTabelaDePaginas(quadrosUsados);
-                this.setEspacoAlocado(this.getEspacoAlocado() + p.getMemory());
-                this.getFila().add(p.getId());
-                return 0;
-            }
-            this.erro.println("Erro 3 (RAM.alocaProcesso): Não há espaço para o processo para ser alocado.");
-            return 3;           
+                this.erro.println("Erro 3 (RAM.alocaProcesso): Não há espaço para o processo para ser alocado.");
+                return 3;
+            } 
+            return 1;
         }catch(Exception e){
             this.erro.println("Erro 1 (RAM.alocaProcesso): Não existe processo para ser alocado.");
             return 1;
         }
     }
     
-    int desalocaProcesso(Processo p){
+     int desalocaProcesso(Processo p){
         if( !this.fila.isEmpty()){
-            if(this.getFila().contains(p.getId())){
-                if(this.getEspacoAlocado() - p.getMemory() <= 0){
-                    this.setEspacoAlocado(this.getEspacoAlocado() - p.getMemory());
-                    this.getFila().remove(p.getId());
-                    return 0;
+            if(this.getFila().contains(p.getId())){ //Se o processo P se encontra na MP
+                ArrayList<Integer> quadrosUsados = p.getTabelaDePaginas();
+                for(int j = 0; j< quadrosUsados.size() ;j++){ //Para cada pagina do processo
+                    int i = quadrosUsados.get(j);   //Há a desalocacao da memoria
+                    this.getQuadroDaMP()[i] = 0;
                 }
-                this.erro.println("Erro 3 (RAM.desalocaProcesso): Espaço alocado com valor negativo.");
-                return 3;
+                p.setTabelaDePaginas(null);
+                this.quadrosAlocados -= p.getQtdPaginas();
+                p.setQtdPaginas(0);
+                this.setEspacoAlocado(this.getEspacoAlocado() - p.getMemory());
+                int index = this.fila.indexOf(p.getId());
+                this.fila.remove(index);
+               
+
+                
+                
+                return 0;
+                
             }
             this.erro.println("Erro 1 (RAM.desalocaProcesso): Não existe processo para ser desalocado.");
             return 1;

@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class Leitura {
-    int id = 0;
+    int id = 1;
     public ArrayList lerArquivos() throws Exception{
         ArrayList <Processo> novos = new ArrayList();
         FileReader arq = new FileReader("processos.txt"); //Lê os processos no arquivo
