@@ -5,13 +5,14 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 
 public class CPU {
-    private int id;
-    private Processo p;
-    private int tempoUtilizacao;
-    private int tempoTotal;         // Variavel que verifica o tempo total em que o processo atual está na cpu
+    private int id;                 // Identificador da cpu
+    private Processo p;             // Processo atualmente na cpu
+    private int tempoUtilizacao;    // Tempo que o processo atual precisa ficar na cpu
+    private int tempoTotal;         // Tempo total em que o processo atual está na cpu
     private PrintStream erro;
     
-    public CPU(int id) throws UnsupportedEncodingException{
+    //Inicia cpu
+    public CPU(int id) throws UnsupportedEncodingException{ 
         this.erro = new PrintStream(System.err, true, "UTF-8");
         this.id = id;
         this.p = null;
@@ -19,29 +20,31 @@ public class CPU {
         this.tempoUtilizacao = 0;
     }
     
+    //cpu recebe processo com prioridade
     public int recebeProcesso(Processo p){
         if(p != null){
             this.p = p;
-            this.tempoUtilizacao = p.getTimeCPU();
+            this.tempoUtilizacao = p.getTimeCPU();  //cpu executará processo até o final
             return 0;
         }
         this.erro.println("Erro 1 (CPU.recebeProcesso): Não existe processo para ser adicionado.");
         return 1;        
     }
     
+    //cpu recebe processo sem prioridade
     public int recebeProcesso(Processo p, int t){
         if(p != null){
             this.p = p;
             
-            if((p.getPrinter() == 1) && (p.getDisc() == 1)){
-                if ((p.getTimePrinter() <= p.getTimeDisc()) && (p.getTimePrinter() <= t)) this.tempoUtilizacao = p.getTimePrinter();
-                else if ((p.getTimeDisc() < p.getTimePrinter()) && (p.getTimeDisc() <= t)) this.tempoUtilizacao = p.getTimeDisc();
-                else this.tempoUtilizacao = t;
-            } else if ((p.getPrinter() == 1) && (p.getTimePrinter() <= t)){ this.tempoUtilizacao = p.getTimePrinter();
-            } else if ((p.getDisc() == 1) && (p.getTimeDisc() <= t)){ this.tempoUtilizacao = p.getTimeDisc();
-            } else if(p.getTimeCPU() < t){
+            if((p.getPrinter() == 1) && (p.getDisc() == 1)){    // caso processo precise de impressora e disco
+                if ((p.getTimePrinter() <= p.getTimeDisc()) && (p.getTimePrinter() <= t)) this.tempoUtilizacao = p.getTimePrinter();    //caso processo necessite da impressora antes ou ao mesmo tempo do disco, e antes ou ao mesmo tempo de acabar o quantum, p será executado até o momento que necessitar da impressora
+                else if ((p.getTimeDisc() < p.getTimePrinter()) && (p.getTimeDisc() <= t)) this.tempoUtilizacao = p.getTimeDisc();      //caso processo necessite do disco antes da impressora, e antes ou ao mesmo tempo de acabar o quantum, p será executado até o momento que necessitar do disco
+                else this.tempoUtilizacao = t;                                                                                          //caso contrario, p será executado até o fim do quantum
+            } else if ((p.getPrinter() == 1) && (p.getTimePrinter() <= t)){ this.tempoUtilizacao = p.getTimePrinter();  // caso processo precise somente de impressora, e antes ou ao mesmo tempo de acabar o quantum, p será executado até o momento que necessitar da impressora
+            } else if ((p.getDisc() == 1) && (p.getTimeDisc() <= t)){ this.tempoUtilizacao = p.getTimeDisc();           // caso processo precise somente de disco, e antes ou ao mesmo tempo de acabar o quantum, p será executado até o momento que necessitar do disco
+            } else if(p.getTimeCPU() < t){      //caso o tempo necessário para findar o processo seja menor que o quantum, p será executado até o fim
                 this.tempoUtilizacao = p.getTimeCPU();
-            }else{
+            }else{                              //caso contrario, p será executado até o fim do quantum
                 this.tempoUtilizacao = t;
             }
             return 0;
@@ -51,6 +54,7 @@ public class CPU {
         return 1;
     }
     
+    //cpu para a execução do processo atual e o envia para outro lugar
     public Object enviaProcesso(){
         if(!this.isOcioso()){   // O processo está na cpu
             // Modifico o tempo restante do uso de CPU
@@ -81,6 +85,7 @@ public class CPU {
         
     }
     
+    //verifica se cpu está ociosa
     public boolean isOcioso(){
         if (this.p == null){
             return true;
@@ -88,6 +93,7 @@ public class CPU {
         return false;
     }
     
+    //envia a prioridade do processo atualmente na cpu, e -1 caso não haja processo na cpu
     public int getPrioridadeProcesso(){
         if(p == null){
             return -1;
@@ -100,7 +106,7 @@ public class CPU {
         this.tempoTotal += 1;
     }
     
-    // Função que verifica que o tempo o processo atingiu o tempo limite
+    // Função que verifica que o processo atingiu o tempo limite
     public boolean terminouExecucao(){
         if(!this.isOcioso()){
             if (this.tempoTotal == this.tempoUtilizacao){
@@ -110,6 +116,7 @@ public class CPU {
         return false;
     }
     
+    //retorna o processo na cpu
     public Processo getProcesso(){
         return this.p;
     }

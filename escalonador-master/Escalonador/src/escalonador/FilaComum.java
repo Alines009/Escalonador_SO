@@ -10,9 +10,10 @@ import java.util.ArrayList;
  * @author Ricardo Monteiro
  */
 public class FilaComum {
-    private ArrayList<ArrayList<Processo>> filaComum;
+    private ArrayList<ArrayList<Processo>> filaComum;   // lista de filas de processos sem prioridade
     private PrintStream erro;
     
+    //inicia fila sem prioridade
     public FilaComum() throws UnsupportedEncodingException{
         this.erro = new PrintStream(System.err, true, "UTF-8");
         this.filaComum = new ArrayList<>();
@@ -31,7 +32,8 @@ public class FilaComum {
         return 1;
     }
     
-   public int recebeProcesso(Processo p, RAM memoria){ //Um processo eh adicionado na fila de processos de usuario
+    //recebe o processo na fila
+    public int recebeProcesso(Processo p, RAM memoria){
             if(p.getQtdExec() == 0){ //Se o processo nunca foi executado
                 memoria.alocaProcesso(p);
                 ArrayList<Processo> a = this.filaComum.get(0); 
@@ -55,6 +57,7 @@ public class FilaComum {
         
     }
     
+    // retorna o primeiro processo na fila e o remove da fila
     public Object enviaProcesso(){
         ArrayList<Processo> a;
         for(int i = 0; i < 3; i++){
@@ -69,6 +72,7 @@ public class FilaComum {
         return 2;
     }
     
+    //Imprime processos na fila
     public void ImprimeComum(){
         System.out.println(Cores.ANSI_RED + "FILA COMUM" + Cores.ANSI_RESET);
         for(int i = 0; i< this.filaComum.size(); i++){
@@ -83,6 +87,7 @@ public class FilaComum {
         }
     }
     
+    //retorna se fila está vazia
     public boolean isVazia(){
         for(int i = 0; i < this.filaComum.size(); i++){
             if(this.filaComum.get(i).size() != 0){

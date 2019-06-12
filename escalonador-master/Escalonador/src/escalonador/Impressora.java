@@ -9,19 +9,21 @@ import java.util.ArrayList;
  * @author Ricardo Monteiro
  */
 public class Impressora {
-    private int id;
-    private Processo p;
-    private int tempo;
-    private int tempoUtilizada;
+    private int id;                 // Identificador da impressora
+    private Processo p;             // Processo atualmente na impressora
+    private int tempo;              // Tempo necessário para se realizar uma função na impressora
+    private int tempoUtilizada;     // Tempo que o processo atual está utilizando a impressora
     
     private PrintStream erro;
     
+    //Inicia impressora
     public Impressora(int id) throws UnsupportedEncodingException{
         this.erro = new PrintStream(System.err, true, "UTF-8");
         this.id = id;
         this.tempo = 3;
     }
     
+    //impressora recebe processo
     public int recebeProcesso(Processo p){
         if(p != null){
             this.p = p;
@@ -31,6 +33,7 @@ public class Impressora {
         return 1;
     }
     
+    // Função que verifica se o processo terminou sua função na impressora
     public boolean terminouExecucao(){
         if(!this.isOciosa()){
             if (this.tempoUtilizada == this.tempo){
@@ -40,12 +43,14 @@ public class Impressora {
         return false;
     }
     
+    // Função que incrementa o tempo do processo atual na impressora
     public void incrementaTempo(){
         if(!this.isOciosa()){
             this.tempoUtilizada++;
         }
     }
     
+    //verifica se impressora está ociosa
     public boolean isOciosa(){
         if (this.p == null){
             return true;
@@ -53,6 +58,7 @@ public class Impressora {
         return false;
     }
     
+    //impressora para a execução do processo atual e o envia para outro lugar
     public Object enviaProcesso(){
         if(!this.isOciosa()){   // O processo está na impressora
             Processo p = this.p;
@@ -66,6 +72,8 @@ public class Impressora {
         this.erro.println("Erro 2 (Impressora.enviaProcesso): Não existe processo para ser enviado.");
         return 2;
     }
+    
+    //retorna o processo na impressora
     public Processo getProcesso(){
         return this.p;
     }
